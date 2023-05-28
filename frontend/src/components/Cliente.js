@@ -2,6 +2,7 @@ import React from 'react';
 import Grid from './Grid';
 import Form from './Form';
 import { useEffect, useState } from 'react';
+import { FaUserAlt } from 'react-icons/fa';
 import axios from 'axios';
 
 const Cliente = () => {
@@ -22,13 +23,16 @@ const Cliente = () => {
 
   return (
     <div>
-	  <div className="ms-3">
-		<h2>crud</h2>
+	  <div className="ms-4 mb-4">
+		<h2><FaUserAlt /> Clientes</h2>
 	  </div>
-      <div className="d-flex">
+	  
+	  <hr className="custom-hr" />
+
+      <div className=" mt-4 d-flex">
         <Form />
       </div>
-      <div className="mt-3 w-75">
+      <div className="mt-4 ms-3 w-75">
         <Grid users={users} />
       </div>
     </div>

@@ -15,9 +15,8 @@ const Form = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel"> 
-			    <BiAddToQueue /> 
-			    CADASTRO
-			  </h5>
+			          <BiAddToQueue /> CADASTRO
+			        </h5>
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
@@ -34,7 +33,7 @@ const Form = () => {
                   <label>Compras:</label>
                   <input name="compras" type="number" className="form-control"/>
                 </div>
-				<div className="mb-3">
+				        <div className="mb-3">
                   <label>Telefone:</label>
                   <input name="fone" type="text" className="form-control"/>
                 </div>
@@ -42,7 +41,7 @@ const Form = () => {
               <button type="submit" className="btn btn-success">SALVAR</button>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal">FECHAR</button>
               {/*<button type="button" className="btn btn-primary">Save changes</button>*/}
             </div>
           </div>

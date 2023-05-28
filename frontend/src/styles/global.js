@@ -13,6 +13,13 @@ body {
     height: 100vh;
     background-color: #f2f2f2;
 }
+
+.custom-hr {
+    background: linear-gradient(to right, transparent, #000, transparent);
+    border: none;
+    height: 1px;
+  }
+
 `;
 
 export default Global;
