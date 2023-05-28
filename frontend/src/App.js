@@ -1,42 +1,80 @@
-import GlobalStyle from './styles/global.js';
-import { useEffect, useState } from 'react';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-import Form from './components/Form.js';
-import Grid from './components/Grid.js';
-import axios from 'axios';
+import { BiStore, BiMenu, BiHome, BiUser } from 'react-icons/bi';
+import GlobalStyle from './styles/global.js'
+import Cliente from './components/Cliente.js';
+import Home from './components/Home.js';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
-  const [users, setUsers] = useState([]);
-	
-	const getUsers = async() => {
-	  try {
-		const res = await axios.get("http://localhost:8080/clientes");
-		setUsers(res.data.sort((a, b) => (a.nome > b.nome ? 1: -1)));
-	  } catch (error) {
-		toast.error(error);
-	  }
-	};
-
-  useEffect(() => {
-    getUsers();
-  }, [setUsers]);
-
   return (
-    <div>
-      
-      <div className="ms-3">
-        <h2>crud</h2> 
+    <BrowserRouter>
+      <div>
+        {/* NavBar */}
+        <nav className="navbar navbar-dark bg-dark fixed-top">
+          <div className="container-fluid">
+            <Link className="navbar-brand" to="/">
+              <BiStore /> LOJA
+            </Link>
+            <button
+              className="navbar-toggler"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#offcanvasDarkNavbar"
+              aria-controls="offcanvasDarkNavbar"
+            >
+              <span className="navbar-toggler-icon"></span>
+            </button>
+            <div
+              className="offcanvas offcanvas-end text-bg-dark"
+              tabIndex="-1"
+              id="offcanvasDarkNavbar"
+              aria-labelledby="offcanvasDarkNavbarLabel"
+            >
+              <div className="offcanvas-header">
+                <h5 className="offcanvas-title" id="offcanvasDarkNavbarLabel">
+                  <BiMenu /> Menu
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  data-bs-dismiss="offcanvas"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="offcanvas-body">
+                <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/">
+                      <BiHome /> Home
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/clientes">
+                      <BiUser /> Clientes
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        {/* Rotas */}
+        <div style={{ paddingTop: '80px' }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/clientes" element={<Cliente />} />
+          </Routes>
+        </div>
+        {/* Estilos globais */}
+        <GlobalStyle />
+
+        {/* Toasts */}
+        <ToastContainer autoClose={3000} position={toast.POSITION.BOTTOM_LEFT} />
       </div>
-      <div className="d-flex">
-        <Form />
-      </div>
-      <div className="mt-3 w-75 ">
-        <Grid users={users}/>
-      </div>
-      <GlobalStyle/>
-      <ToastContainer autoClose={3000} position={toast.POSITION.BOTTOM_LEFT} />
-    </div>
+    </BrowserRouter>
   );
 }
 
