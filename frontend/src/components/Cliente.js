@@ -33,7 +33,7 @@ const Cliente = () => {
         <Form />
       </div>
       <div className="mt-4 ms-3 w-75">
-        <Grid users={users} />
+        <Grid users={users} setUsers={setUsers}/>
       </div>
     </div>
   );
