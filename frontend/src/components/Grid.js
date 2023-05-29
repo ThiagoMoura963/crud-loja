@@ -17,10 +17,10 @@ const Grid = ({ users, setUsers }) => {
   };
 
   return (
-	  <div>
-      <table className="table table-hover table-striped">
+	  <div className="d-flex justify-content-center" >
+      <table className="table table-hover table-striped w-75">
         <thead>	
-          <tr>
+          <tr className="bg-dark text-white"> 
             <th scope="col">Nome</th>
             <th scope="col">Endereço</th>
             <th scope="col">Compras</th>
@@ -30,24 +30,6 @@ const Grid = ({ users, setUsers }) => {
           </tr>
         </thead>
         <tbody>
-         {/*  <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-        	<td>@mdo</td>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td colspan="2">Larry the Bird</td>
-            <td>@twitter</td>
-          </tr>
-		  */}
 		      {users.map((item, i) => {
 		        return(
 		          <tr key={i}>
@@ -56,12 +38,12 @@ const Grid = ({ users, setUsers }) => {
 			          <td width="10%">{item.compras}</td>
 			          <td width="20%">{item.telefone}</td>
 			          <td>
-			            <FaEdit 
+			            <FaEdit title="Editar"
                   style={{cursor: "pointer"}} 
                   />
 			          </td>
 			          <td>
-			            <FaTrash 
+			            <FaTrash title="Deletar"
                   onClick={() => handleDelete(item.id)}
                   style={{cursor: "pointer"}} 
                   />	

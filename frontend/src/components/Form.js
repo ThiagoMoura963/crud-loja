@@ -1,12 +1,63 @@
+import axios from 'axios';
 import React, { useRef } from 'react';
 import { BiAddToQueue } from "react-icons/bi";
+import { toast } from 'react-toastify';
+import { useState } from 'react';
 
-const Form = () => {
+
+const Form = ({ getUsers }) => {
   const ref = useRef();
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const user = ref.current;
+
+    if (
+      !user.nome.value || 
+      !user.endereco.value || 
+      !user.compras.value || 
+      !user.telefone.value 
+    ) {
+      return toast.warn("Preencha todos os campos!");
+    } else {
+
+    await axios
+      .post("http://localhost:8080/cliente", {
+        nome: user.nome.value,
+        endereco: user.endereco.value,
+        compras: parseInt(user.compras.value),
+        telefone: user.telefone.value,
+      })
+      .then(({ data }) => toast.success(data.message))
+      .catch((error) =>  toast.error(error.response.data.error));
+    }
+
+    user.nome.value = "";
+    user.endereco.value = "";
+    user.compras.value = "";
+    user.telefone.value = "";
+
+      
+      getUsers();
+  };
+  
+
   return (
     <div>
       {/* Botão para cadastrar novo cliente */}
-      <button className='btn btn-primary btn-sm ms-3' data-bs-toggle="modal" data-bs-target="#exampleModal"> 
+      <button className='btn btn-primary ms-3' onClick={handleShowModal} data-bs-toggle="modal" data-bs-target="#exampleModal"> 
 	  <BiAddToQueue /> novo cadastro
       </button>
       {/* Modal */}
@@ -20,7 +71,7 @@ const Form = () => {
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
-              <form ref={ref}>
+              <form ref={ref} onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label">Nome:</label>
                   <input name="nome" type="text" className="form-control"/>
@@ -35,10 +86,10 @@ const Form = () => {
                 </div>
 				        <div className="mb-3">
                   <label>Telefone:</label>
-                  <input name="fone" type="text" className="form-control"/>
+                  <input name="telefone" type="text" className="form-control"/>
                 </div>
+                <button type="submit" className="btn btn-success">SALVAR</button>
               </form>
-              <button type="submit" className="btn btn-success">SALVAR</button>
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-danger" data-bs-dismiss="modal">FECHAR</button>

@@ -30,9 +30,9 @@ const Cliente = () => {
 	  <hr className="custom-hr" />
 
       <div className=" mt-4 d-flex">
-        <Form />
+        <Form getUsers={getUsers}/>
       </div>
-      <div className="mt-4 ms-3 w-75">
+      <div className="mt-4">
         <Grid users={users} setUsers={setUsers}/>
       </div>
     </div>
