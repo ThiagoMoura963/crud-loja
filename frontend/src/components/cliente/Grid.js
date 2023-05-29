@@ -2,8 +2,13 @@ import React from "react";
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import DeleteAlert from "../DeletAlert";
+import { useState } from "react";
 
 const Grid = ({ users, setUsers }) => {
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+
   const handleDelete = async (id) => {
     await axios 
     .delete("http://localhost:8080/cliente/" + id)
@@ -16,9 +21,31 @@ const Grid = ({ users, setUsers }) => {
     .catch(({ data }) => toast.error(data));
   };
 
+  const openDeleteAlert = (id) => {
+    setSelectedUserId(id);
+    setShowDeleteAlert(true);
+  };
+
+  const closeDeleteAlert = () => {
+    setShowDeleteAlert(false);
+  };
+
+  const confirmDelete = () => {
+    if (selectedUserId) {
+      handleDelete(selectedUserId);
+      closeDeleteAlert();
+    }
+  };
+
+
   return (
 	  <div className="d-flex justify-content-center" >
-      <table className="table table-hover table-striped w-75">
+      <DeleteAlert
+        show={showDeleteAlert}
+        onCancel={closeDeleteAlert}
+        onConfirm={confirmDelete}
+      />
+     <table className="table table-hover table-striped w-75">
         <thead>	
           <tr className="bg-dark text-white"> 
             <th scope="col">Nome</th>
@@ -44,7 +71,7 @@ const Grid = ({ users, setUsers }) => {
 			          </td>
 			          <td>
 			            <FaTrash title="Deletar"
-                  onClick={() => handleDelete(item.id)}
+                  onClick={() => openDeleteAlert(item.id)}
                   style={{cursor: "pointer"}} 
                   />	
 			          </td>

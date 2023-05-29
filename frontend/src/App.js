@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import { BiStore, BiMenu, BiHome, BiUser } from 'react-icons/bi';
 import GlobalStyle from './styles/global.js'
-import Cliente from './components/Cliente.js';
+import Cliente from './components/cliente/Cliente.js';
 import Home from './components/Home.js';
 import 'react-toastify/dist/ReactToastify.css';
 
