@@ -1,29 +1,47 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { BiAddToQueue } from "react-icons/bi";
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 import InputMask from 'react-input-mask';
 
-const Form = ({ getUsers }) => {
+const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) => {
   const ref = useRef();
-
-  const [nome, setNome] = useState('');
-
-  const handleInputChange = (e) => {
-  const onlyLetters = e.target.value.replace(/[^A-Za-z]/g, '');
-
-  setNome(onlyLetters);
-  };
+  const telefoneRef = useRef(null);
 
   const [showModal, setShowModal] = useState(false);
+  const [nome, setNome] = useState('');
+
+  useEffect(() => {
+    if (onEdit) {
+      console.log(onEdit);
+      const user = ref.current;
+      if (user) {
+        user.nome.value = onEdit.nome;
+        user.endereco.value = onEdit.endereco;
+        user.compras.value = onEdit.compras;
+        telefoneRef.current.value = onEdit.telefone;
+      }
+    }
+  }, [onEdit]);
+
+  const handleInputChange = (e) => {
+    const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');  
+    setNome(onlyLetters);
+  };
 
   const handleCloseModal = () => {
-    setShowModal(false);
+    if(onEdit) {
+      setShowEditModal(false);
+    } else {
+      setShowModal(false);
+    }
   };
 
   const handleShowModal = () => {
+    setOnEdit(null);
     setShowModal(true);
+    setNome('');
   };
 
   const handleSubmit = async (e) => {
@@ -38,16 +56,28 @@ const Form = ({ getUsers }) => {
       !user.telefone.value
     ) {
       return toast.warn("Preencha todos os campos!");
+    } 
+
+    if(onEdit) {
+      await axios
+        .put("http://localhost:8080/cliente/" + onEdit.id, {
+          nome: user.nome.value,
+          endereco: user.endereco.value,
+          compras: parseInt(user.compras.value),
+          telefone: user.telefone.value,
+        })
+        .then(({ data }) => toast.success(data.message))
+        .catch(( error ) => console.error(error));
     } else {
-      try {
         await axios.post("http://localhost:8080/cliente", {
           nome: user.nome.value,
           endereco: user.endereco.value,
           compras: parseInt(user.compras.value),
           telefone: user.telefone.value,
-        });
-
-        toast.success("Cliente cadastrado com sucesso");
+        })
+        .then(() => toast.success("Cliente cadastrado com sucesso"))
+        .catch(( error ) => console.error(error));
+    }
 
         user.nome.value = "";
         user.endereco.value = "";
@@ -55,12 +85,7 @@ const Form = ({ getUsers }) => {
         user.telefone.value = "";
 
         handleCloseModal();
-
         getUsers();
-      } catch (error) {
-        toast.error(error.response.data.error);
-      }
-    }
   };
   return (
     <div>
@@ -70,10 +95,13 @@ const Form = ({ getUsers }) => {
       </button>
 
       {/* Modal */}
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Modal show={onEdit ? showEditModal : showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>
-            <BiAddToQueue /> CADASTRO
+          {/* <BiAddToQueue /> CADASTRO */}
+          {onEdit && Object.keys(onEdit).length > 0 ? 
+          (<span>Editar Cliente</span>) : 
+          (<span>Cadastrar Cliente</span>)}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -92,7 +120,7 @@ const Form = ({ getUsers }) => {
             </div>
             <div className="mb-3">
               <label>Telefone:</label>
-              <InputMask mask="(99)99999-9999" name="telefone" type="text" className="form-control"/>
+              <InputMask mask="(99)99999-9999" name="telefone" type="text" className="form-control" ref={telefoneRef}/>
             </div>
             <Button variant="success" type="submit">
               SALVAR

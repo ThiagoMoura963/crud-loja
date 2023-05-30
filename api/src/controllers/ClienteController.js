@@ -6,13 +6,7 @@ export default {
     try {
       const { nome, endereco, compras, telefone } = req.body;
 
-      let cliente = await prisma.cliente.findUnique({ where: { telefone } });
-
-      if (cliente) {
-        return res.status(400).json({ error: "Telefone já existe" });
-      }
-
-      cliente = await prisma.cliente.create({
+      await prisma.cliente.create({
         data: {
           nome,
           endereco,

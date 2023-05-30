@@ -16,7 +16,7 @@ model Cliente {
   nome      String
   endereco  String
   compras   Int
-  telefone  String @unique
+  telefone  String 
   vendas    Venda[] 
 }
 

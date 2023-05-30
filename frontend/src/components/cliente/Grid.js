@@ -5,9 +5,15 @@ import axios from 'axios';
 import DeleteAlert from "../DeletAlert";
 import { useState } from "react";
 
-const Grid = ({ users, setUsers }) => {
+const Grid = ({ users, setUsers, setOnEdit, setShowEditModal, setShowModal }) => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
+
+  const handleEdit = (item) => {
+    setOnEdit(item);
+    setShowEditModal(true); 
+    setShowModal(false);
+  };
 
   const handleDelete = async (id) => {
     await axios 
@@ -19,6 +25,8 @@ const Grid = ({ users, setUsers }) => {
       toast.success(data.message);
     })
     .catch(({ data }) => toast.error(data));
+
+    setOnEdit(null);
   };
 
   const openDeleteAlert = (id) => {
@@ -37,7 +45,6 @@ const Grid = ({ users, setUsers }) => {
     }
   };
 
-
   return (
 	  <div className="d-flex justify-content-center" >
       <DeleteAlert
@@ -45,6 +52,7 @@ const Grid = ({ users, setUsers }) => {
         onCancel={closeDeleteAlert}
         onConfirm={confirmDelete}
       />
+
      <table className="table table-hover table-striped w-75">
         <thead>	
           <tr className="bg-dark text-white"> 
@@ -57,8 +65,7 @@ const Grid = ({ users, setUsers }) => {
           </tr>
         </thead>
         <tbody>
-		      {users.map((item, i) => {
-		        return(
+		      {users.map((item, i) => (
 		          <tr key={i}>
 			          <td width="30%">{item.nome}</td>
 			          <td width="30%">{item.endereco}</td>
@@ -66,6 +73,9 @@ const Grid = ({ users, setUsers }) => {
 			          <td width="20%">{item.telefone}</td>
 			          <td>
 			            <FaEdit title="Editar"
+                  onClick={() => {
+                  handleEdit(item);
+                  }}                  
                   style={{cursor: "pointer"}} 
                   />
 			          </td>
@@ -75,9 +85,8 @@ const Grid = ({ users, setUsers }) => {
                   style={{cursor: "pointer"}} 
                   />	
 			          </td>
-			        </tr>
-		        );	
-		      })}
+			        </tr>	
+		      ))}
         </tbody>
       </table>
 	  </div>
