@@ -94,7 +94,7 @@ export default {
 
       await prisma.produto.delete({where: { id: Number(id) }});
 
-      return res.status(200).json({ message: "Produto deletado!" });
+      return res.status(200).json({ message: "Produto deletado com sucesso!" });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error });

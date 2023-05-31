@@ -14,7 +14,7 @@ const Cliente = () => {
 
   const getUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/clientes');
+      const res = await axios.get("http://localhost:8080/clientes");
       setUsers(res.data.sort((a, b) => (a.nome > b.nome ? 1 : -1)));
     } catch (error) {
       console.error(error);
@@ -33,7 +33,7 @@ const Cliente = () => {
 	  
 	  <hr className="custom-hr" />
 
-      <div className=" mt-4 d-flex">
+      <div className="mt-4 d-flex">
         <Form  getUsers={getUsers} onEdit={onEdit} setOnEdit={setOnEdit
         } showEditModal={showEditModal} setShowEditModal={setShowEditModal} 
          />

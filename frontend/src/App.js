@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-import { BiStore, BiMenu, BiHome, BiUser } from 'react-icons/bi';
+import { BiStore, BiMenu, BiHome, BiUser, BiShoppingBag } from 'react-icons/bi';
 import GlobalStyle from './styles/global.js'
 import Cliente from './components/cliente/Cliente.js';
 import Produto from './components/produto/Produto.js';
@@ -58,7 +58,7 @@ function App() {
                   </li>
                   <li className="nav-item">
                     <Link className="nav-link" to="/produtos">
-                       Produtos
+                      <BiShoppingBag /> Produtos
                     </Link>
                   </li>
                 </ul>

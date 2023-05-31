@@ -20,6 +20,10 @@ body {
     height: 1px;
   }
 
+  textarea {
+    resize: none;
+  }
+
 `;
 
 export default Global;

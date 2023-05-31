@@ -1,10 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { BiAddToQueue } from "react-icons/bi";
+import { BiAddToQueue } from 'react-icons/bi';
 import { toast } from 'react-toastify';
-import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 import { IMaskInput } from "react-imask";
-
+import axios from 'axios';
 
 const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) => {
   const nomeRef = useRef(null);
@@ -113,7 +112,7 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
             </div>
             <div className="mb-3">
               <label>Telefone:</label>
-              <IMaskInput mask="(00)00000-0000" placeholder="(99)99999-9999" name="telefone" className="form-control" inputRef={telefoneRef} />
+              <IMaskInput mask="(00)00000-0000" placeholder="Ex: (99)99999-9999" name="telefone" type="text" className="form-control" inputRef={telefoneRef} />
             </div>
             <Button variant="success" type="submit">
               SALVAR

@@ -24,7 +24,7 @@ const Grid = ({ users, setUsers, setOnEdit, setShowEditModal, setShowModal }) =>
       setUsers(newArray);
       toast.success(data.message);
     })
-    .catch(({ data }) => toast.error(data));
+    .catch((error) => console.error(error));
 
     setOnEdit(null);
   };
@@ -48,9 +48,9 @@ const Grid = ({ users, setUsers, setOnEdit, setShowEditModal, setShowModal }) =>
   return (
 	  <div className="d-flex justify-content-center" >
       <DeleteAlert
-        show={showDeleteAlert}
-        onCancel={closeDeleteAlert}
-        onConfirm={confirmDelete}
+      show={showDeleteAlert}
+      onCancel={closeDeleteAlert}
+      onConfirm={confirmDelete}
       />
 
      <table className="table table-hover table-striped w-75">
@@ -69,7 +69,7 @@ const Grid = ({ users, setUsers, setOnEdit, setShowEditModal, setShowModal }) =>
 		          <tr key={i}>
 			          <td width="30%">{item.nome}</td>
 			          <td width="30%">{item.endereco}</td>
-			          <td width="10%">{item.compras}</td>
+			          <td width="10%">{item.compras ? item.compras : 0}</td>
 			          <td width="20%">{item.telefone}</td>
 			          <td>
 			            <FaEdit title="Editar"
