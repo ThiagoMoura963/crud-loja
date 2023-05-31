@@ -73,9 +73,7 @@ const Grid = ({ users, setUsers, setOnEdit, setShowEditModal, setShowModal }) =>
 			          <td width="20%">{item.telefone}</td>
 			          <td>
 			            <FaEdit title="Editar"
-                  onClick={() => {
-                  handleEdit(item);
-                  }}                  
+                  onClick={() => handleEdit(item)}              
                   style={{cursor: "pointer"}} 
                   />
 			          </td>

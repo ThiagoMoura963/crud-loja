@@ -6,11 +6,14 @@ import GridProduto from "./GridProduto";
 
 const Produto = () => {	
   const [produtos, setProdutos]	= useState([]);
+  const [onEdit, setOnEdit] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const getProdutos = async () => {
     try {
 	  const res = await axios.get("http://localhost:8080/produtos")	
-	  setProdutos(res.data.sort((a, b) => (a.nome > b.nome ? 1 : -1)));
+	  setProdutos(res.data.sort((a, b) => (a.precoVenda < b.precoVenda ? 1 : -1)));
 	} catch (error) {
 	  console.error(error);	
 	}
@@ -29,10 +32,24 @@ const Produto = () => {
 	  <hr className="custom-hr" />
 
 	  <div className="mt-4 d-flex">
-		<FormProduto />
+		<FormProduto 
+		getProdutos={getProdutos} 
+		onEdit={onEdit} 
+		setOnEdit={setOnEdit} 
+		showEditModal={showEditModal}
+		setShowEditModal={setShowEditModal} 
+		/>
 	  </div>
 	  <div className="mt-4">
-	    <GridProduto produtos={produtos} setProdutos={setProdutos} />	
+	    <GridProduto
+		produtos={produtos} 
+		setProdutos={setProdutos}
+		setOnEdit={setOnEdit}
+		showEditModal={showEditModal}
+		setShowEditModal={setShowEditModal}
+		setShowModal={setShowModal}
+		showModal={showModal}
+		 />	
 	  </div>
 
 	</div>

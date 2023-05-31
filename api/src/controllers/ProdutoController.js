@@ -75,7 +75,7 @@ export default {
           },
       });
           
-      return res.status(200).json(produto);
+      return res.status(200).json({ message: "Produto atualizado com sucesso" });
       
     } catch (error) {
       console.error(error);

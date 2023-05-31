@@ -4,9 +4,15 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import DeleteAlert from "../DeletAlert";
 
-const GridProduto = ({ produtos, setProdutos }) => {
+const GridProduto = ({ produtos, setProdutos, setOnEdit, setShowEditModal, setShowModal }) => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [selectedProdutoId, setSelectedProdutoId] = useState(null);
+
+  const handleEdit = (item) => {
+    setOnEdit(item);
+	setShowEditModal(true);
+	setShowModal(false);
+  };
 
   const handleDelete = async (id) => {
     await axios
@@ -18,12 +24,14 @@ const GridProduto = ({ produtos, setProdutos }) => {
 	  toast.success(data.message);
 	})
 	.catch((error) => console.error(error));
+
+	setOnEdit(null);
   };
 
   const openDeleteAlert = (id) => {
 	setSelectedProdutoId(id);
 	setShowDeleteAlert(true);
-  }
+  };
 
   const closeDeleteAlert = () => {
     setShowDeleteAlert(false);
@@ -34,7 +42,7 @@ const GridProduto = ({ produtos, setProdutos }) => {
       handleDelete(selectedProdutoId);
 	  closeDeleteAlert();
 	}
-  }
+  };
 
   return (
     <div className="d-flex justify-content-center">
@@ -72,7 +80,10 @@ const GridProduto = ({ produtos, setProdutos }) => {
 			  <td>{item.qtdEstoque}</td>
 			  <td>{item.qtdLoja}</td>
 			  <td>
-		        <FaEdit title="Editar" style={{cursor: "pointer"}}/>		
+		        <FaEdit 
+				title="Editar" 
+				onClick={() => handleEdit(item)}
+				style={{cursor: "pointer"}}/>		
 			  </td>
 			  <td>
 				<FaTrash title="Deletar" 

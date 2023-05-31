@@ -14,14 +14,10 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
   const [nome, setNome] = useState('');
 
   useEffect(() => {
-    if (onEdit) {
-      const user = { nome: nomeRef.current, endereco: enderecoRef.current };
-
-      if (user) {
-        user.nome.value = onEdit.nome;
-        user.endereco.value = onEdit.endereco;
+    if(onEdit) {
+        nomeRef.current.value = onEdit.nome;
+        enderecoRef.current.value = onEdit.endereco;
         telefoneRef.current.value = onEdit.telefone;
-      }
     }
   }, [onEdit]);
 
@@ -47,12 +43,10 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const user = { nome: nomeRef.current, endereco: enderecoRef.current, telefone: telefoneRef.current };
-
     if (
-      !user.nome.value ||
-      !user.endereco.value ||
-      !user.telefone.value
+      !nomeRef.current.value ||
+      !enderecoRef.current.value ||
+      !telefoneRef.current.value
     ) {
       return toast.warn("Preencha todos os campos!");
     } 
@@ -60,28 +54,29 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
     if(onEdit) {
       await axios
         .put("http://localhost:8080/cliente/" + onEdit.id, {
-          nome: user.nome.value,
-          endereco: user.endereco.value,
-          telefone: user.telefone.value,
+          nome: nomeRef.current.value,
+          endereco: enderecoRef.current.value,
+          telefone: telefoneRef.current.value,
         })
         .then(({ data }) => toast.success(data.message))
         .catch(( error ) => console.error(error));
     } else {
-        await axios.post("http://localhost:8080/cliente", {
-          nome: user.nome.value,
-          endereco: user.endereco.value,
-          telefone: user.telefone.value,
-        })
-        .then(() => toast.success("Cliente cadastrado com sucesso"))
-        .catch(( error ) => console.error(error));
+      await axios
+        .post("http://localhost:8080/cliente", {
+          nome: nomeRef.current.value,
+          endereco: enderecoRef.current.value,
+          telefone: telefoneRef.current.value,
+      })
+      .then(() => toast.success("Cliente cadastrado com sucesso"))
+      .catch((error) => console.error(error));
     }
 
-        user.nome.value = "";
-        user.endereco.value = "";
-        user.telefone.value = "";
+    nomeRef.current.value = "";
+    enderecoRef.current.value = "";
+    telefoneRef.current.value = "";
 
-        handleCloseModal();
-        getUsers();
+    handleCloseModal();
+    getUsers();
   };
   return (
     <div>

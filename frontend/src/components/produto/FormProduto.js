@@ -2,19 +2,111 @@ import React, {useRef, useState, useEffect} from 'react';
 import { BiAddToQueue } from 'react-icons/bi';
 import { toast } from 'react-toastify';
 import { Modal, Button } from 'react-bootstrap';
+import { IMaskInput } from "react-imask";
 import axios from 'axios';
 
-const FormProduto = () => {
+const FormProduto = ({ getProdutos, setOnEdit, onEdit, showEditModal, setShowEditModal }) => {
+  const nomeRef = useRef(null);
+  const descricaoRef = useRef(null);
+  const marcaRef = useRef(null);
+  const fornecedorRef = useRef(null);
+  const classificacaoRef = useRef(null);
+  const precoCustoRef = useRef(null);
+  const precoVendaRef = useRef(null);
+  const qtdEstoqueRef = useRef(null);
+  const qtdLojaRef = useRef(null);
+
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+	if(onEdit) {
+		nomeRef.current.value = onEdit.nome;
+		descricaoRef.current.value = onEdit.descricao;
+		marcaRef.current.value = onEdit.marca;
+		fornecedorRef.current.value = onEdit.fornecedor;
+		classificacaoRef.current.value = onEdit.classificacao;
+		precoCustoRef.current.value = onEdit.precoCusto;
+		precoVendaRef.current.value = onEdit.precoVenda;
+		qtdEstoqueRef.current.value = onEdit.qtdEstoque;
+		qtdLojaRef.current.value = onEdit.qtdLoja;
+	}
+  }, [onEdit]);
   
   const handleCloseModal = () => {
-    setShowModal(false);
+    if(onEdit) {
+	  setShowEditModal(false);
+	} else
+	  setShowModal(false);
   };
   
   const handleShowModal = () => {
+	setOnEdit(null);
 	setShowModal(true);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+	if(
+	  !nomeRef.current.value ||	
+	  !descricaoRef.current.value ||	
+	  !marcaRef.current.value ||	
+	  !fornecedorRef.current.value ||	
+	  !classificacaoRef.current.value ||	
+	  !precoCustoRef.current.value ||	
+	  !precoVendaRef.current.value ||	
+	  !qtdEstoqueRef.current.value ||	
+	  !qtdLojaRef.current.value 	
+	) {
+	  return toast.warn("Preencha todos os campos!");
+	}
+
+	if(onEdit) {
+	  await axios
+	    .put("http://localhost:8080/produto/" + onEdit.id, {
+		  nome: nomeRef.current.value,
+		  descricao: descricaoRef.current.value,	
+		  marca: marcaRef.current.value,	
+		  fornecedor: fornecedorRef.current.value,	
+		  classificacao: classificacaoRef.current.value,	
+		  precoCusto: parseFloat(precoCustoRef.current.value),	
+		  precoVenda: parseFloat(precoVendaRef.current.value),	
+		  qtdEstoque: parseInt(qtdEstoqueRef.current.value),	
+		  qtdLoja: parseInt(qtdLojaRef.current.value),		
+		})	
+		.then(({ data }) => toast.success(data.message))
+		.catch((error) => console.error(error));
+	} else {
+	  await	axios
+	    .post("http://localhost:8080/produto", {
+		  nome: nomeRef.current.value,
+		  descricao: descricaoRef.current.value,	
+		  marca: marcaRef.current.value,	
+		  fornecedor: fornecedorRef.current.value,	
+		  classificacao: classificacaoRef.current.value,	
+		  precoCusto: parseFloat(precoCustoRef.current.value),	
+		  precoVenda: parseFloat(precoVendaRef.current.value),	
+		  qtdEstoque: parseInt(qtdEstoqueRef.current.value),	
+		  qtdLoja: parseInt(qtdLojaRef.current.value),		
+		})	
+		.then(() => toast.success("Produto cadastrado com sucesso"))
+		.catch((error) => console.error(error));
+	}
+
+	nomeRef.current.value = ""
+	descricaoRef.current.value = ""
+	marcaRef.current.value = ""
+	fornecedorRef.current.value = ""
+	classificacaoRef.current.value = ""
+	precoCustoRef.current.value = ""
+	precoVendaRef.current.value = ""
+	qtdEstoqueRef.current.value = ""
+	qtdLojaRef.current.value = ""
+
+	handleCloseModal();
+	getProdutos();
+
+  };
 
   return (
     <div>
@@ -24,49 +116,51 @@ const FormProduto = () => {
 	  </button>
 
 	  {/* Modal */}
-	  <Modal show={showModal} onHide={handleCloseModal}>
+	  <Modal show={onEdit ? showEditModal : showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>
-            Cadastrar Produto 
+		  {onEdit && Object.keys(onEdit).length > 0 ? 
+          (<span>Editar Cliente</span>) : 
+          (<span>Cadastrar Cliente</span>)}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label className="form-label">Nome do produto: </label>
-              <input name="nome" type="text" className="form-control"/>
+              <input name="nome" type="text" className="form-control" ref={nomeRef}/>
             </div>
             <div className="mb-3">
               <label>Descrição: </label>
-              <textarea name="descricao" className="form-control" rows="3"/>
+              <textarea name="descricao" className="form-control" rows="3" ref={descricaoRef}/>
             </div>
             <div className="mb-3">
               <label>Marca: </label>
-              <input name="marca" type="text" className="form-control"/>
+              <input name="marca" type="text" className="form-control" ref={marcaRef}/>
             </div>
 			<div className="mb-3">
               <label>Fornecedor: </label>
-              <input name="fornecedor" type="text" className="form-control"/>
+              <input name="fornecedor" type="text" className="form-control" ref={fornecedorRef}/>
             </div>
 			<div className="mb-3">
               <label>classificacao: </label>
-              <input name="classificacao" type="text" className="form-control"/>
+              <input name="classificacao" type="text" className="form-control" ref={classificacaoRef}/>
             </div>
 			<div className="mb-3">
               <label>Preço de custo: </label>
-              <input name="precoCusto" type="number" className="form-control"/>
+              <IMaskInput mask={Number} radix="." name="precoCusto" type="text" className="form-control" inputRef={precoCustoRef}/>
             </div>
 			<div className="mb-3">
               <label>Preço de venda: </label>
-              <input name="precoVenda" type="number" className="form-control"/>
+              <IMaskInput mask={Number} radix="." name="precoVenda" type="text" className="form-control" inputRef={precoVendaRef}/>
             </div>
 			<div className="mb-3">
               <label>Unidades em estoque: </label>
-              <input name="qtdEstoque" type="number" className="form-control"/>
+              <input name="qtdEstoque" type="number" className="form-control" ref={qtdEstoqueRef}/>
             </div>
 			<div className="mb-3">
               <label>Unidades na loja: </label>
-              <input name="qtdLoja" type="number" className="form-control"/>
+              <input name="qtdLoja" type="number" className="form-control" ref={qtdLojaRef}/>
             </div>
             <Button variant="success" type="submit">
               SALVAR
