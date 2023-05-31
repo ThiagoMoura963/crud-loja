@@ -3,10 +3,12 @@ import { BiAddToQueue } from "react-icons/bi";
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
-import InputMask from 'react-input-mask';
+import { IMaskInput } from "react-imask";
+
 
 const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) => {
-  const ref = useRef();
+  const nomeRef = useRef(null);
+  const enderecoRef = useRef(null);
   const telefoneRef = useRef(null);
 
   const [showModal, setShowModal] = useState(false);
@@ -14,12 +16,11 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
 
   useEffect(() => {
     if (onEdit) {
-      console.log(onEdit);
-      const user = ref.current;
+      const user = { nome: nomeRef.current, endereco: enderecoRef.current };
+
       if (user) {
         user.nome.value = onEdit.nome;
         user.endereco.value = onEdit.endereco;
-        user.compras.value = onEdit.compras;
         telefoneRef.current.value = onEdit.telefone;
       }
     }
@@ -47,12 +48,11 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const user = ref.current;
+    const user = { nome: nomeRef.current, endereco: enderecoRef.current, telefone: telefoneRef.current };
 
     if (
       !user.nome.value ||
       !user.endereco.value ||
-      !user.compras.value ||
       !user.telefone.value
     ) {
       return toast.warn("Preencha todos os campos!");
@@ -63,7 +63,6 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
         .put("http://localhost:8080/cliente/" + onEdit.id, {
           nome: user.nome.value,
           endereco: user.endereco.value,
-          compras: parseInt(user.compras.value),
           telefone: user.telefone.value,
         })
         .then(({ data }) => toast.success(data.message))
@@ -72,7 +71,6 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
         await axios.post("http://localhost:8080/cliente", {
           nome: user.nome.value,
           endereco: user.endereco.value,
-          compras: parseInt(user.compras.value),
           telefone: user.telefone.value,
         })
         .then(() => toast.success("Cliente cadastrado com sucesso"))
@@ -81,7 +79,6 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
 
         user.nome.value = "";
         user.endereco.value = "";
-        user.compras.value = "";
         user.telefone.value = "";
 
         handleCloseModal();
@@ -105,22 +102,18 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <form ref={ref} onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label className="form-label">Nome:</label>
-              <input name="nome" type="text" className="form-control" value={nome} onChange={handleInputChange}/>
+              <input name="nome" type="text" className="form-control" value={nome} onChange={handleInputChange} ref={nomeRef}/>
             </div>
             <div className="mb-3">
               <label>Endereço:</label>
-              <input name="endereco" type="text" className="form-control" />
-            </div>
-            <div className="mb-3">
-              <label>Compras:</label>
-              <input name="compras" type="number" className="form-control" />
+              <input name="endereco" type="text" className="form-control" ref={enderecoRef}/>
             </div>
             <div className="mb-3">
               <label>Telefone:</label>
-              <InputMask mask="(99)99999-9999" name="telefone" type="text" className="form-control" ref={telefoneRef}/>
+              <IMaskInput mask="(00)00000-0000" placeholder="(99)99999-9999" name="telefone" className="form-control" inputRef={telefoneRef} />
             </div>
             <Button variant="success" type="submit">
               SALVAR

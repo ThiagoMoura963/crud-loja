@@ -4,13 +4,12 @@ const prisma = new PrismaClient();
 export default {
   async createCliente(req, res) {
     try {
-      const { nome, endereco, compras, telefone } = req.body;
+      const { nome, endereco, telefone } = req.body;
 
       await prisma.cliente.create({
         data: {
           nome,
           endereco,
-          compras,
           telefone,
         },
       });
@@ -52,7 +51,7 @@ export default {
   async updateCliente(req, res) {
     try {
       const { id } = req.params;
-      const { nome, endereco, compras, telefone } = req.body;
+      const { nome, endereco, telefone } = req.body;
 
       let cliente = await prisma.cliente.findUnique({where: { id: Number(id) }});
 
@@ -65,7 +64,6 @@ export default {
         data: {
           nome,
           endereco,
-          compras,
           telefone,
         },
       });
@@ -98,6 +96,3 @@ export default {
     }
   }
 };
-
-
-

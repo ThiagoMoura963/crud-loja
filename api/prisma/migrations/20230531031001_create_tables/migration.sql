@@ -3,7 +3,7 @@ CREATE TABLE `Cliente` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `nome` VARCHAR(191) NOT NULL,
     `endereco` VARCHAR(191) NOT NULL,
-    `compras` INTEGER NOT NULL,
+    `compras` INTEGER NULL,
     `telefone` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)

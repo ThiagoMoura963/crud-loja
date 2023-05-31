@@ -4,6 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { BiStore, BiMenu, BiHome, BiUser } from 'react-icons/bi';
 import GlobalStyle from './styles/global.js'
 import Cliente from './components/cliente/Cliente.js';
+import Produto from './components/produto/Produto.js';
 import Home from './components/Home.js';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -55,6 +56,11 @@ function App() {
                       <BiUser /> Clientes
                     </Link>
                   </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/produtos">
+                       Produtos
+                    </Link>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -66,6 +72,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/clientes" element={<Cliente />} />
+            <Route path="/produtos" element={<Produto/>}/>
           </Routes>
         </div>
         {/* Estilos globais */}
