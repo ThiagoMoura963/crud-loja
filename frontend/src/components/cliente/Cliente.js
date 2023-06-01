@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from './Grid';
 import Form from './Form';
-import { useEffect, useState } from 'react';
 import { FaUserAlt } from 'react-icons/fa';
 import axios from 'axios';
 

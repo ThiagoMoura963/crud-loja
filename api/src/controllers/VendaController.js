@@ -5,34 +5,39 @@ const prisma = new PrismaClient();
 export default {
   async createVenda(req, res) {
     try {
-      const { clienteId, vendedor, itens } = req.body;
-    
+      const { clienteId, vendedor, data, vendaItens } = req.body;
+
       const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });
 
       if (!cliente) {
         return res.status(404).json({ error: "Cliente não encontrado" });
       }
 
-      const produtos = await prisma.produto.findMany({ where: { id: { in: itens.map(item => item.id) } } });
-
-      if (produtos.length !== itens.length) {
+      const produtos = await prisma.produto.findMany({ where: { id: { in: vendaItens.map(item => item.produtoId) } } });
+      
+      if (produtos.length !== vendaItens.length) {
         return res.status(404).json({ message: "Produto não encontrado" });
       }
 
-      const valor = produtos.reduce((total, produto) => {
-        const item = itens.find(item => item.id === produto.id);
+      const valor = vendaItens.reduce((total, item) => {
+        const produto = produtos.find(produto => produto.id === item.produtoId);
         return total + (produto.precoVenda * item.quantidade);
       }, 0);
 
       const venda = await prisma.venda.create({
         data: {
           cliente: { connect: { id: clienteId } },
-          data: new Date(),
-          itens: { connect: itens.map((item) => ({ id: item.id })) },
+          data: new Date(data),
+          vendaItens: {
+            create: vendaItens.map(item => ({
+              produto: { connect: { id: item.produtoId } },
+              quantidade: item.quantidade,
+            })),
+          },
           valor,
           vendedor,
         },
-        include: { cliente: true, itens: true },
+        include: { cliente: true, vendaItens: true },
       });
 
       return res.status(201).json(venda);
@@ -50,20 +55,34 @@ export default {
           data: true,
           valor: true,
           vendedor: true,
-          cliente: {select: { nome: true }}
-        }
+          cliente: {
+            select: {
+              nome: true
+            }
+          },
+          vendaItens: {
+            select: {
+              quantidade: true,
+              produto: {
+                select: {
+                  nome: true
+                }
+              }
+            }
+          }
+        },
       });
-      
+  
       return res.status(200).json(vendas);
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error });    
+      return res.status(500).json({ error });
     }
   },
 
   async updateVenda(req, res) {
     const { nroVenda } = req.params;
-    const { clienteId, vendedor, itens } = req.body;
+    const { clienteId, vendedor, data, vendaItens } = req.body;
   
     try {
       const venda = await prisma.venda.findUnique({ where: { nroVenda: Number(nroVenda) } });
@@ -78,10 +97,10 @@ export default {
         return res.status(404).json({ message: "Cliente não encontrado" });
       }
   
-      const produtos = await prisma.produto.findMany({ where: { id: { in: itens.map(item => item.id) } } });
+      const produtos = await prisma.produto.findMany({ where: { id: { in: vendaItens.map(item => item.produtoId) } } });
   
-      const valor = produtos.reduce((total, produto) => {
-        const item = itens.find(item => item.id === produto.id);
+      const valor = vendaItens.reduce((total, item) => {
+        const produto = produtos.find(produto => produto.id === item.produtoId);
         return total + (produto.precoVenda * item.quantidade);
       }, 0);
   
@@ -89,14 +108,31 @@ export default {
         where: { nroVenda: Number(nroVenda) },
         data: {
           cliente: { connect: { id: clienteId } },
-          data: new Date(),
-          itens: { connect: itens.map((item) => ({ id: item.id })) },
-          valor,
           vendedor,
+          valor,
+          data,
+          vendaItens: {
+            updateMany: vendaItens.map((item) => ({
+              where: { id: item.id },
+              data: { quantidade: item.quantidade, produtoId: item.produtoId },
+            })),
+          },
         },
-        include: { cliente: true, itens: true },
+        include: {
+          cliente: true,
+          vendaItens: {
+            select: {
+              quantidade: true,
+              produto: {
+                select: {
+                  nome: true,
+                },
+              },
+            },
+          },
+        },
       });
-  
+
       return res.status(200).json({ message: "Venda atualizada com sucesso!" });
     } catch (error) {
       console.error(error);
@@ -106,16 +142,22 @@ export default {
 
   async deleteVenda(req, res) {
     const { nroVenda } = req.params;
-
+  
     try {
-      const venda = await prisma.venda.findUnique({ where: { nroVenda: Number(nroVenda) } });
-      
-      if(!venda) {
+      const venda = await prisma.venda.findUnique({
+        where: { nroVenda: Number(nroVenda) }
+      });
+  
+      if (!venda) {
         return res.status(404).json({ message: "Venda não encontrada" });
       }
 
-      await prisma.venda.delete({ where: { nroVenda: Number(nroVenda)} });
-
+      await prisma.vendaItem.deleteMany({
+        where: { vendaId: Number(nroVenda) }
+      });
+  
+      await prisma.venda.delete({ where: { nroVenda: Number(nroVenda) } });
+  
       return res.status(200).json({ message: "Venda deletada com sucesso!" });
     } catch (error) {
       console.error(error);

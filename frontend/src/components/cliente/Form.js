@@ -98,16 +98,16 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
         <Modal.Body>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label">Nome:</label>
-              <input name="nome" type="text" className="form-control" value={nome} onChange={handleInputChange} ref={nomeRef}/>
+              <label for="nome" className="form-label">Nome:</label>
+              <input id="nome" type="text" className="form-control" value={nome} onChange={handleInputChange} ref={nomeRef}/>
             </div>
             <div className="mb-3">
-              <label>Endereço:</label>
-              <input name="endereco" type="text" className="form-control" ref={enderecoRef}/>
+              <label for="endereco" className="form-label">Endereço:</label>
+              <input id="endereco" type="text" className="form-control" ref={enderecoRef}/>
             </div>
             <div className="mb-3">
-              <label>Telefone:</label>
-              <IMaskInput mask="(00)00000-0000" placeholder="Ex: (99)99999-9999" name="telefone" type="text" className="form-control" inputRef={telefoneRef} />
+              <label for="telefone" className="form-label">Telefone:</label>
+              <IMaskInput mask="(00)00000-0000" placeholder="Ex: (99)99999-9999" id="telefone" type="text" className="form-control" inputRef={telefoneRef} />
             </div>
             <Button variant="success" type="submit">
               SALVAR

@@ -127,41 +127,46 @@ const FormProduto = ({ getProdutos, setOnEdit, onEdit, showEditModal, setShowEdi
         <Modal.Body>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label">Nome do produto: </label>
-              <input name="nome" type="text" className="form-control" ref={nomeRef}/>
+              <label for="nome" className="form-label">Nome do produto: </label>
+              <input id="nome" type="text" className="form-control" ref={nomeRef}/>
             </div>
             <div className="mb-3">
-              <label>Descrição: </label>
-              <textarea name="descricao" className="form-control" rows="3" ref={descricaoRef}/>
+              <label for="descricao" className="form-label">Descrição: </label>
+              <textarea id="descricao" name="descricao" className="form-control" rows="3" ref={descricaoRef}/>
             </div>
             <div className="mb-3">
-              <label>Marca: </label>
-              <input name="marca" type="text" className="form-control" ref={marcaRef}/>
+              <label for="marca" className="form-label">Marca: </label>
+              <input id="marca" type="text" className="form-control" ref={marcaRef}/>
             </div>
 			<div className="mb-3">
-              <label>Fornecedor: </label>
-              <input name="fornecedor" type="text" className="form-control" ref={fornecedorRef}/>
+              <label for="fornecedor" className="form-label">Fornecedor: </label>
+              <input id="fornecedor" type="text" className="form-control" ref={fornecedorRef}/>
             </div>
 			<div className="mb-3">
-              <label>classificacao: </label>
-              <input name="classificacao" type="text" className="form-control" ref={classificacaoRef}/>
+              <label for="classificacao" className="form-label">classificacao: </label>
+              <input id="classificacao" type="text" className="form-control" ref={classificacaoRef}/>
             </div>
-			<div className="mb-3">
-              <label>Preço de custo: </label>
-              <IMaskInput mask={Number} radix="." name="precoCusto" type="text" className="form-control" inputRef={precoCustoRef}/>
+			<div className="row mb-3">
+			  <div className='col'>
+                <label for="precoCusto" className="form-label">Preço de custo: </label>
+                <IMaskInput mask={Number} radix="." id="precoCusto" type="text" className="form-control" inputRef={precoCustoRef}/>
+			  </div>
+			  <div className="col">
+                <label for="precoVenda" className="form-label">Preço de venda: </label>
+                <IMaskInput mask={Number} radix="." id="precoVenda" type="text" className="form-control" inputRef={precoVendaRef}/>
+			  </div>
             </div>
-			<div className="mb-3">
-              <label>Preço de venda: </label>
-              <IMaskInput mask={Number} radix="." name="precoVenda" type="text" className="form-control" inputRef={precoVendaRef}/>
-            </div>
-			<div className="mb-3">
-              <label>Unidades em estoque: </label>
-              <input name="qtdEstoque" type="number" className="form-control" ref={qtdEstoqueRef}/>
-            </div>
-			<div className="mb-3">
-              <label>Unidades na loja: </label>
-              <input name="qtdLoja" type="number" className="form-control" ref={qtdLojaRef}/>
-            </div>
+			<div className="row mb-3">
+			  <div className="col">	
+                <label for="qtdEstoque" className="form-label">Unidades em estoque: </label>
+                <input id="qtdEstoque" type="number" className="form-control" ref={qtdEstoqueRef}/>
+			  </div>
+			  <div className="col">
+                <label for="qtdLoja" className="form-label">Unidades na loja: </label>
+                <input id="qtdLoja" type="number" className="form-control" ref={qtdLojaRef}
+				/>
+			  </div>
+			</div>
             <Button variant="success" type="submit">
               SALVAR
             </Button>

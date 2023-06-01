@@ -32,16 +32,27 @@ model Produto {
   precoVenda      Float
   qtdEstoque      Int
   qtdLoja         Int
-  vendas          Venda[]  
+  vendas          Venda[] 
+  vendasItem      VendaItem[] 
 }
 
 // Definição do modelo Venda
 model Venda {
-  nroVenda  Int      @id @default(autoincrement())
-  cliente   Cliente  @relation(fields: [clienteId], references: [id])
-  clienteId Int
-  data      DateTime @default(now())
-  itens     Produto[]
-  valor     Float
-  vendedor  String 
+  nroVenda     Int          @id @default(autoincrement())
+  cliente      Cliente      @relation(fields: [clienteId], references: [id])
+  clienteId    Int
+  data         DateTime     @default(now())
+  itens        Produto[]
+  vendaItens   VendaItem[]
+  valor        Float
+  vendedor     String 
+}
+
+model VendaItem {
+  id         Int      @id @default(autoincrement())
+  venda      Venda    @relation(fields: [vendaId], references: [nroVenda])
+  vendaId    Int
+  produto    Produto  @relation(fields: [produtoId], references: [id])
+  produtoId  Int
+  quantidade Int
 }

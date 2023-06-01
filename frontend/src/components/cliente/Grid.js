@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import axios from 'axios';
 import DeleteAlert from "../DeletAlert";
-import { useState } from "react";
+import axios from 'axios';
 
 const Grid = ({ users, setUsers, setOnEdit, setShowEditModal, setShowModal }) => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
