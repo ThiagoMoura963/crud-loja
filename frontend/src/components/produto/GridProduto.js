@@ -63,8 +63,7 @@ const GridProduto = ({ produtos, setProdutos, setOnEdit, setShowEditModal, setSh
 		    <th scope="col">Preço de venda</th>	
 		    <th scope="col">Unidades em estoque</th>	
 		    <th scope="col">Unidades na loja</th>	
-		    <th scope="col"></th>
-		    <th scope="col"></th>
+		    <th scope="col" colSpan={2}></th>
 		  </tr>	
 		</thead>
 		<tbody>

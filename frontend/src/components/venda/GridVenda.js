@@ -26,7 +26,7 @@ const GridVenda = ({ vendas, setVendas }) => {
 	  >
 		<Modal.Header closeButton>
 	      <Modal.Title>
-			Itens
+			Detalhes
 		  </Modal.Title>	
 		</Modal.Header>
 		<Modal.Body>
@@ -38,10 +38,10 @@ const GridVenda = ({ vendas, setVendas }) => {
       		  </tr>
     	  </thead>
     	  <tbody>
-      		{vendas.map((item, i) => (
+      		{vendas.map((item) => (
         	  item.vendaItens.map((vendaItem, j) => (
                 <tr key={j}>
-                  <td>{vendaItem.produto.nome}</td>
+                  <td>{vendaItem.nomeProduto}</td>
                   <td>{vendaItem.quantidade}</td>
                 </tr>
              ))
@@ -58,19 +58,21 @@ const GridVenda = ({ vendas, setVendas }) => {
 		<th scope="col">Itens</th>
 		<th scope="col">Valor</th>
 		<th scope="col">Vendedor</th>
-		<th scope="col"></th>
-		<th scope="col"></th>
-		<th scope="col"></th>
+		<th scope="col" colSpan={2}></th>
 		</tr>
 	  </thead>
 	  <tbody>
 		{vendas.map((item, i) => (
 		  <tr key={i}>
-            <td>{item.cliente.nome}</td> 
+		    <td>
+  			  {item.vendaItens.map((vendaItem, j) => (
+    		  <div key={j}>{vendaItem.nomeCliente}</div>
+  		  ))}
+			</td>			
 			<td>{format(new Date(item.data), 'dd/MM/yyyy')}</td> 
 			<td>
   			  <a className="link-opacity-50" href="#" onClick={openModalItens}>
-    			Detalhes
+    			Produtos
   			  </a>
     		</td>            
 			<td>R${item.valor.toFixed(2)}</td> 

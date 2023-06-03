@@ -52,13 +52,13 @@ export default {
     try {
       const { id } = req.params;
       const { nome, endereco, telefone } = req.body;
-
-      let cliente = await prisma.cliente.findUnique({where: { id: Number(id) }});
-
-      if(!cliente) {
+  
+      let cliente = await prisma.cliente.findUnique({ where: { id: Number(id) } });
+  
+      if (!cliente) {
         return res.status(404).json({ error: "Não foi possível encontrar esse cliente" });
       }
-
+  
       cliente = await prisma.cliente.update({
         where: { id: Number(id) },
         data: {
@@ -67,8 +67,8 @@ export default {
           telefone,
         },
       });
-
-      return res.status(200).json({ message: "Cliente atualizado com sucesso!" });
+  
+      return res.status(200).json(cliente);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error });
@@ -78,18 +78,27 @@ export default {
   async deleteCliente(req, res) {
     try {
       const { id } = req.params;
-      
-      const cliente = await prisma.cliente.findUnique({where: { id: Number(id) }});
-      
-      if(!cliente) {
+  
+      const cliente = await prisma.cliente.findUnique({ where: { id: Number(id) } });
+  
+      if (!cliente) {
         return res.status(404).json({ error: "Não foi possível encontrar esse cliente" });
       }
+  
+      const vendas = await prisma.venda.findMany({ where: { clienteId: Number(id) } });
       
-      await prisma.venda.deleteMany({ where: { clienteId: Number(id) } });
-
-      await prisma.cliente.delete({where: { id: Number(id) }});
-
-      return res.status(200).json({message: "Cliente deletado com sucesso!"})
+      await Promise.all(
+        vendas.map(async (venda) => {
+          await prisma.venda.update({
+            where: { nroVenda: venda.nroVenda },
+            data: { cliente: { disconnect: true } },
+          });
+        })
+      );
+  
+      await prisma.cliente.delete({ where: { id: Number(id) } });
+  
+      return res.status(200).json({ message: "Cliente deletado com sucesso!" });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error });

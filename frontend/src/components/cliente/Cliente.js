@@ -38,7 +38,7 @@ const Cliente = () => {
          />
       </div>
       <div className="mt-4">
-        <Grid users={users} setUsers={setUsers} setOnEdit={setOnEdit}showEditModal={showEditModal}
+        <Grid users={users} setUsers={setUsers} onEdit={onEdit} setOnEdit={setOnEdit}showEditModal={showEditModal}
         setShowEditModal={setShowEditModal} setShowModal={setShowModal} showModal={showModal} />
       </div>
     </div>

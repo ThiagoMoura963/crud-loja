@@ -13,8 +13,8 @@ datasource db {
 // Definição do modelo Cliente
 model Cliente {
   id        Int      @id @default(autoincrement())
-  nome      String
-  endereco  String
+  nome      String  
+  endereco  String 
   compras   Int?
   telefone  String 
   vendas    Venda[] 
@@ -24,7 +24,7 @@ model Cliente {
 model Produto {
   id              Int       @id @default(autoincrement())
   nome            String
-  descricao       String?
+  descricao       String
   marca           String
   fornecedor      String
   classificacao   String
@@ -32,15 +32,16 @@ model Produto {
   precoVenda      Float
   qtdEstoque      Int
   qtdLoja         Int
-  vendas          Venda[] 
-  vendasItem      VendaItem[] 
+  vendas          Venda[]
+  vendasItem      VendaItem[]
 }
 
 // Definição do modelo Venda
 model Venda {
   nroVenda     Int          @id @default(autoincrement())
-  cliente      Cliente      @relation(fields: [clienteId], references: [id])
-  clienteId    Int
+  cliente      Cliente?      @relation(fields: [clienteId], references: [id])
+  clienteId    Int?
+  nomeCliente  String
   data         DateTime     @default(now())
   itens        Produto[]
   vendaItens   VendaItem[]
@@ -52,7 +53,9 @@ model VendaItem {
   id         Int      @id @default(autoincrement())
   venda      Venda    @relation(fields: [vendaId], references: [nroVenda])
   vendaId    Int
-  produto    Produto  @relation(fields: [produtoId], references: [id])
-  produtoId  Int
+  produto    Produto? @relation(fields: [produtoId], references: [id])
+  produtoId  Int?
   quantidade Int
+  nomeProduto String
+  nomeCliente String
 }

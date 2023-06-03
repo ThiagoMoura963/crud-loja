@@ -1,17 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import DeleteAlert from "../DeletAlert";
 import axios from 'axios';
 
-const Grid = ({ users, setUsers, setOnEdit, setShowEditModal, setShowModal }) => {
+const Grid = ({ users, setUsers, setOnEdit, setShowEditModal, setShowModal, onEdit }) => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
   const handleEdit = (item) => {
     setOnEdit(item);
     setShowEditModal(true); 
-    setShowModal(false);
+    setShowModal(false);  
   };
 
   const handleDelete = async (id) => {
@@ -59,13 +59,12 @@ const Grid = ({ users, setUsers, setOnEdit, setShowEditModal, setShowModal }) =>
             <th scope="col">Endereço</th>
             <th scope="col">Compras</th>
             <th scope="col">Telefone</th>
-			      <th scope="col"></th>
-			      <th scope="col"></th>
+			      <th scope="col" colSpan={2}></th>
           </tr>
         </thead>
         <tbody>
-		      {users.map((item, i) => (
-		          <tr key={i}>
+		      {users.map((item) => (
+		          <tr key={item.id}>
 			          <td width="30%">{item.nome}</td>
 			          <td width="30%">{item.endereco}</td>
 			          <td width="10%">{item.compras ? item.compras : 0}</td>

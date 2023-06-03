@@ -13,7 +13,7 @@ CREATE TABLE `Cliente` (
 CREATE TABLE `Produto` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `nome` VARCHAR(191) NOT NULL,
-    `descricao` VARCHAR(191) NULL,
+    `descricao` VARCHAR(191) NOT NULL,
     `marca` VARCHAR(191) NOT NULL,
     `fornecedor` VARCHAR(191) NOT NULL,
     `classificacao` VARCHAR(191) NOT NULL,
@@ -28,7 +28,8 @@ CREATE TABLE `Produto` (
 -- CreateTable
 CREATE TABLE `Venda` (
     `nroVenda` INTEGER NOT NULL AUTO_INCREMENT,
-    `clienteId` INTEGER NOT NULL,
+    `clienteId` INTEGER NULL,
+    `nomeCliente` VARCHAR(191) NOT NULL,
     `data` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `valor` DOUBLE NOT NULL,
     `vendedor` VARCHAR(191) NOT NULL,
@@ -40,8 +41,10 @@ CREATE TABLE `Venda` (
 CREATE TABLE `VendaItem` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `vendaId` INTEGER NOT NULL,
-    `produtoId` INTEGER NOT NULL,
+    `produtoId` INTEGER NULL,
     `quantidade` INTEGER NOT NULL,
+    `nomeProduto` VARCHAR(191) NOT NULL,
+    `nomeCliente` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -56,13 +59,13 @@ CREATE TABLE `_ProdutoToVenda` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Venda` ADD CONSTRAINT `Venda_clienteId_fkey` FOREIGN KEY (`clienteId`) REFERENCES `Cliente`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Venda` ADD CONSTRAINT `Venda_clienteId_fkey` FOREIGN KEY (`clienteId`) REFERENCES `Cliente`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `VendaItem` ADD CONSTRAINT `VendaItem_vendaId_fkey` FOREIGN KEY (`vendaId`) REFERENCES `Venda`(`nroVenda`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `VendaItem` ADD CONSTRAINT `VendaItem_produtoId_fkey` FOREIGN KEY (`produtoId`) REFERENCES `Produto`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `VendaItem` ADD CONSTRAINT `VendaItem_produtoId_fkey` FOREIGN KEY (`produtoId`) REFERENCES `Produto`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `_ProdutoToVenda` ADD CONSTRAINT `_ProdutoToVenda_A_fkey` FOREIGN KEY (`A`) REFERENCES `Produto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

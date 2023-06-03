@@ -6,40 +6,52 @@ export default {
   async createVenda(req, res) {
     try {
       const { clienteId, vendedor, data, vendaItens } = req.body;
-
+  
       const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });
-
+  
       if (!cliente) {
         return res.status(404).json({ error: "Cliente não encontrado" });
       }
-
+  
       const produtos = await prisma.produto.findMany({ where: { id: { in: vendaItens.map(item => item.produtoId) } } });
-      
+  
       if (produtos.length !== vendaItens.length) {
         return res.status(404).json({ message: "Produto não encontrado" });
       }
-
+  
       const valor = vendaItens.reduce((total, item) => {
         const produto = produtos.find(produto => produto.id === item.produtoId);
         return total + (produto.precoVenda * item.quantidade);
       }, 0);
-
+  
+      const vendaItensData = [];
+  
+      for (const item of vendaItens) {
+        const produto = await prisma.produto.findUnique({ where: { id: item.produtoId } });
+        const nomeProduto = produto ? produto.nome : null;
+  
+        vendaItensData.push({
+          produto: { connect: { id: item.produtoId } },
+          quantidade: item.quantidade,
+          nomeProduto: nomeProduto,
+          nomeCliente: cliente.nome,
+        });
+      }
+  
       const venda = await prisma.venda.create({
         data: {
           cliente: { connect: { id: clienteId } },
           data: new Date(data),
           vendaItens: {
-            create: vendaItens.map(item => ({
-              produto: { connect: { id: item.produtoId } },
-              quantidade: item.quantidade,
-            })),
+            create: vendaItensData,
           },
           valor,
           vendedor,
+          nomeCliente: cliente.nome,
         },
         include: { cliente: true, vendaItens: true },
       });
-
+  
       return res.status(201).json(venda);
     } catch (error) {
       console.error(error);
@@ -63,14 +75,11 @@ export default {
           vendaItens: {
             select: {
               quantidade: true,
-              produto: {
-                select: {
-                  nome: true
-                }
-              }
+              nomeProduto: true,
+              nomeCliente: true
             }
           }
-        },
+        }
       });
   
       return res.status(200).json(vendas);
@@ -79,7 +88,7 @@ export default {
       return res.status(500).json({ error });
     }
   },
-
+  
   async updateVenda(req, res) {
     const { nroVenda } = req.params;
     const { clienteId, vendedor, data, vendaItens } = req.body;

@@ -6,20 +6,23 @@ import { IMaskInput } from "react-imask";
 import axios from 'axios';
 
 const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) => {
-  const nomeRef = useRef(null);
-  const enderecoRef = useRef(null);
-  const telefoneRef = useRef(null);
-
   const [showModal, setShowModal] = useState(false);
   const [nome, setNome] = useState('');
+  const [endereco, setEndereco] = useState('');
+  const [telefone, setTelefone] = useState('');
 
   useEffect(() => {
-    if(onEdit) {
-        nomeRef.current.value = onEdit.nome;
-        enderecoRef.current.value = onEdit.endereco;
-        telefoneRef.current.value = onEdit.telefone;
+    if (onEdit) {
+      setNome(onEdit.nome);
+      setEndereco(onEdit.endereco);
+      setTelefone(onEdit.telefone);
+    } else {
+      setNome('');
+      setEndereco('');
+      setTelefone('');
     }
   }, [onEdit]);
+
 
   const handleInputChange = (e) => {
     const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');  
@@ -43,37 +46,33 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      !nomeRef.current.value ||
-      !enderecoRef.current.value ||
-      !telefoneRef.current.value
-    ) {
-      return toast.warn("Preencha todos os campos!");
-    } 
+    if (!nome || !endereco || !telefone) {
+      return toast.warn('Preencha todos os campos!');
+    }
 
     if(onEdit) {
       await axios
         .put("http://localhost:8080/cliente/" + onEdit.id, {
-          nome: nomeRef.current.value,
-          endereco: enderecoRef.current.value,
-          telefone: telefoneRef.current.value,
+          nome,
+          endereco,
+          telefone,
         })
         .then(({ data }) => toast.success(data.message))
         .catch(( error ) => console.error(error));
     } else {
       await axios
         .post("http://localhost:8080/cliente", {
-          nome: nomeRef.current.value,
-          endereco: enderecoRef.current.value,
-          telefone: telefoneRef.current.value,
+          nome,
+          endereco,
+          telefone,
       })
       .then(() => toast.success("Cliente cadastrado com sucesso"))
       .catch((error) => console.error(error));
     }
 
-    nomeRef.current.value = "";
-    enderecoRef.current.value = "";
-    telefoneRef.current.value = "";
+    setNome('');
+    setEndereco('');
+    setTelefone('');
 
     handleCloseModal();
     getUsers();
@@ -98,16 +97,16 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
         <Modal.Body>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label for="nome" className="form-label">Nome:</label>
-              <input id="nome" type="text" className="form-control" value={nome} onChange={handleInputChange} ref={nomeRef}/>
+              <label className="form-label">Nome: </label>
+              <input name="nome" type="text" className="form-control" value={nome} onChange={(e) => setNome(e.target.value)} />
             </div>
             <div className="mb-3">
-              <label for="endereco" className="form-label">Endereço:</label>
-              <input id="endereco" type="text" className="form-control" ref={enderecoRef}/>
+              <label className="form-label">Endereço: </label>
+              <input name="endereco" type="text" className="form-control" value={endereco} onChange={(e) => setEndereco(e.target.value)}/>
             </div>
             <div className="mb-3">
-              <label for="telefone" className="form-label">Telefone:</label>
-              <IMaskInput mask="(00)00000-0000" placeholder="Ex: (99)99999-9999" id="telefone" type="text" className="form-control" inputRef={telefoneRef} />
+              <label className="form-label">Telefone: </label>
+              <IMaskInput mask="(00)00000-0000" placeholder="Ex: (99)99999-9999" value={telefone} name="telefone" type="text" className="form-control" onAccept={(value) => setTelefone(value)} onChange={(e) => setTelefone(e.target.value)}/>
             </div>
             <Button variant="success" type="submit">
               SALVAR

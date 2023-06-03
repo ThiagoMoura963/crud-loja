@@ -86,13 +86,25 @@ export default {
   async deleteProduto(req, res) {
     try {
       const { id } = req.params;
-      const produto = await prisma.produto.findUnique({where: { id: Number(id) }});
-      
-      if(!produto) {
+  
+      const produto = await prisma.produto.findUnique({ where: { id: Number(id) } });
+
+      if (!produto) {
         return res.status(404).json({ error: "Produto não encontrado" });
       }
+  
+      const vendaItens = await prisma.vendaItem.findMany({ where: { produtoId: Number(id) } });
 
-      await prisma.produto.delete({where: { id: Number(id) }});
+      await Promise.all(
+        vendaItens.map(async (vendaItem) => {
+          await prisma.vendaItem.update({
+            where: { id: vendaItem.id },
+            data: { produto: { disconnect: true } },
+          });
+        })
+      );
+  
+      await prisma.produto.delete({ where: { id: Number(id) } });
 
       return res.status(200).json({ message: "Produto deletado com sucesso!" });
     } catch (error) {
