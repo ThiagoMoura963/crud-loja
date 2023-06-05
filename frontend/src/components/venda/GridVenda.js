@@ -10,6 +10,7 @@ const GridVenda = ({ vendas, setVendas, setOnEdit, setShowEditModal, setShowModa
   const [showModalItens, setShowModalItens] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedVendaItens, setSelectedVendaItens] = useState([]);
 
   const handleEdit = (item) => {
     setOnEdit(item);
@@ -47,8 +48,10 @@ const GridVenda = ({ vendas, setVendas, setOnEdit, setShowEditModal, setShowModa
 	}
   };
  
-  const openModalItens = () => {
+  const openModalItens = (vendaItens) => {
+	setSelectedVendaItens(vendaItens);
     setShowModalItens(true);
+	console.log(vendaItens);
   };
 
   const closeModalItens = () => {
@@ -80,14 +83,12 @@ const GridVenda = ({ vendas, setVendas, setOnEdit, setShowEditModal, setShowModa
       		  </tr>
     	  </thead>
     	  <tbody>
-      		{vendas.map((item) => (
-        	  item.vendaItens.map((vendaItem, j) => (
-                <tr key={j}>
-                  <td>{vendaItem.nomeProduto}</td>
-                  <td>{vendaItem.quantidade}</td>
-                </tr>
-             ))
-           ))}
+		  {selectedVendaItens.map((vendaItem, j) => (
+          <tr key={j}>
+            <td>{vendaItem.nomeProduto}</td>
+            <td>{vendaItem.quantidade}</td>
+          </tr>
+        ))}
          </tbody>
        </table>		
 	  </Modal.Body>
@@ -108,12 +109,12 @@ const GridVenda = ({ vendas, setVendas, setOnEdit, setShowEditModal, setShowModa
 		  <tr key={i}>
 		    <td>
   			  {item.vendaItens.map((vendaItem, j) => (
-    		  <div key={j}>{vendaItem.nomeCliente}</div>
+    		  <div key={j}>{j === 0 && vendaItem.nomeCliente}</div>
   		  ))}
 			</td>			
 			<td>{format(new Date(item.data), 'dd/MM/yyyy')}</td> 
 			<td>
-  			  <a className="link-opacity-50" href="#" onClick={openModalItens}>
+  			  <a className="link-opacity-50" href="#" onClick={() => openModalItens(item.vendaItens)}>
     			Produtos
   			  </a>
     		</td>            
@@ -122,7 +123,7 @@ const GridVenda = ({ vendas, setVendas, setOnEdit, setShowEditModal, setShowModa
 			<td>
 			  <FaEdit 
 			  title="Editar"
-			  onClick={() => handleEdit(i)}
+			  onClick={() => handleEdit(item)}
 			  style={{cursor: "pointer"}}
 			  />	
 			</td>

@@ -3,25 +3,21 @@ import { BiAddToQueue } from 'react-icons/bi';
 import { toast } from 'react-toastify';
 import { Modal, Button } from 'react-bootstrap';
 import { FaTrash } from "react-icons/fa";
+import { format, parse } from 'date-fns';
 import axios from 'axios';
 
 const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditModal }) => {
   const [showModal, setShowModal] = useState(false);
-  const [produtos, setProdutos] = useState([""]);
-  const [clienteList, setClienteList] = useState([""]);
-  const [quantidade, setQuantidade] = useState([0]);
-  const [valorVenda, setValorVenda] = useState([]);
+  const [produtos, setProdutos] = useState([]);
+  const [clienteList, setClienteList] = useState([]);
+  const [quantidade, setQuantidade] = useState([]);
   const [data, setData] = useState("");
-  const [produtoList, setProdutoList] = useState([]);
+  const [produtoList, setProdutoList] = useState([""]);
   const [clientes, setClientes] = useState([]);
   const [produtoValues, setProdutoValues] = useState([]);
   const [vendedor, setVendedor] = useState("");
 
-
-  console.log("ID do Cliente: " + typeof clienteList);
-  console.log("ID do Produto: " + produtoList);
-  
-
+  console.log("Lista de cliente: " + clienteList);
 
   const getClientes = async () => {
     try {
@@ -49,20 +45,17 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
     getProdutoValues();
   }, []);
 
+  console.log(clienteList);
 
-  useEffect(() => {
-    if (onEdit) {
-      setClienteList(onEdit.clienteList);
-      setData(onEdit.data);
-      setProdutoList(onEdit.produtoList);
-      setQuantidade(onEdit.quantidade);
-      setVendedor(onEdit.vendedor);
-    } else {
-      setClienteList('');
-      setData('');
-      setProdutoList('');
-    }
-  }, [onEdit]);
+    useEffect(() => {
+      if (onEdit) {
+        setVendedor(onEdit.vendedor);
+        setClienteList([]);
+        setProdutoList([]);
+        setQuantidade([]);
+        setData("")
+      }
+    }, [onEdit]);
 
   const handleChange = (selectedProductId, i) => {
     const updatedProdutoList = [...produtoList];
@@ -79,9 +72,12 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
 
   const handleDelete = (i, e) => {
     e.preventDefault();
-    const values = [...produtos];
-    values.splice(i, 1);
-    setProdutos(values);
+    const newProdutos = [...produtos];
+    const newQuantidade = [...quantidade];
+    newProdutos.splice(i, 1);
+    newQuantidade.splice(i, 1);
+    setProdutos(newProdutos);
+    setQuantidade(newQuantidade);
   };
 
   const handleCloseModal = () => {
@@ -104,7 +100,17 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+    if (
+      !clienteList ||
+      !data || 
+      !produtoList ||
+      !quantidade ||
+      !vendedor
+    ) {
+      return toast.warn("Preencha todos os campos!");
+    }
+
     const valores = produtoValues.map((produto, i) => quantidade[i] * produto.precoVenda);
     const valorTotal = valores.reduce((total, valor) => total + valor, 0);
   
@@ -114,17 +120,32 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
         quantidade: parseInt(quantidade[i]),
       };
     });
-  
-    await axios
+    const formattedDate = format(new Date(data), 'yyyy-MM-dd');
+
+    if(onEdit) {
+
+      await axios
+        .put("http://localhost:8080/venda/" + onEdit.nroVenda, {
+          clienteId: parseInt(clienteList),
+          vendedor,
+          data: parse(formattedDate, 'yyyy-MM-dd', new Date()),
+          vendaItens: vendaItensData,
+          valor: parseFloat(valorTotal),
+        }) 
+        .then(({ data }) => toast.success(data.message))
+        .catch((error) => console.error(error));
+    } else {
+      await axios
       .post("http://localhost:8080/venda", {
         clienteId: parseInt(clienteList),
         vendedor,
-        data,
+        data: parse(formattedDate, 'yyyy-MM-dd', new Date()),
         vendaItens: vendaItensData,
         valor: parseFloat(valorTotal),
       })
       .then(() => toast.success("Venda cadastrada com sucesso"))
       .catch((error) => console.error(error));
+    }
   
     handleCloseModal();
     getVendas();
@@ -137,10 +158,12 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
       <BiAddToQueue /> novo cadastro
     </button>
       {/* Modal */}
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Modal show={onEdit ? showEditModal : showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>
-            <BiAddToQueue /> CADASTRO 
+            {onEdit && Object.keys(onEdit).length > 0 ? 
+            (<span>Editar Cliente</span>) : 
+            (<span>Cadastrar Cliente</span>)}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -196,9 +219,9 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
                 value={quantidade[i] || ""}
                 onChange={(e) => {
                   const selectedQuantidade = e.target.value;
-                  const inputQuantidade = [...quantidade];
-                  inputQuantidade[i] = selectedQuantidade;
-                  setQuantidade(inputQuantidade);
+                  const newQuantidade = [...quantidade];
+                  newQuantidade[i] = selectedQuantidade;
+                  setQuantidade(newQuantidade);
                 }}
               />
         {i > 0 && (
