@@ -24,10 +24,10 @@ const Form = ({ getUsers, setOnEdit, onEdit, showEditModal, setShowEditModal }) 
   }, [onEdit]);
 
 
-  const handleInputChange = (e) => {
+  /*const handleInputChange = (e) => {
     const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');  
     setNome(onlyLetters);
-  };
+  }; */
 
   const handleCloseModal = () => {
     if(onEdit) {

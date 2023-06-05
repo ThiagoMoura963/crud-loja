@@ -23,9 +23,18 @@ export default {
 
   async findAllClientes(_, res) {
     try {
-      const clientes = await prisma.cliente.findMany();
+      const clientes = await prisma.cliente.findMany({
+        include: {
+          vendas: true,
+        }
+      });
+
+      const clientesAtualizados = clientes.map((cliente) => {
+        const compras = cliente.vendas.length;
+        return { ...cliente, compras };
+      });
       
-      return res.status(200).json(clientes);
+      return res.status(200).json(clientesAtualizados);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error });
@@ -35,7 +44,13 @@ export default {
   async findCliente(req, res) {
     try {
       const { id } = req.params;
-      const cliente = await prisma.cliente.findUnique({where: { id: Number(id) }});
+      const cliente = await prisma.cliente.findUnique({
+        where: 
+        { id: Number(id) }, 
+        include: {
+          vendas: true
+        }
+      });
       
       if(!cliente) {
         return res.status(404).json({ error: "Não foi possível encontrar esse usuário" });
@@ -53,7 +68,12 @@ export default {
       const { id } = req.params;
       const { nome, endereco, telefone } = req.body;
   
-      let cliente = await prisma.cliente.findUnique({ where: { id: Number(id) } });
+      let cliente = await prisma.cliente.findUnique({ 
+        where: { id: Number(id) },
+        include: {
+          vendas: true,
+        } 
+      });
   
       if (!cliente) {
         return res.status(404).json({ error: "Não foi possível encontrar esse cliente" });
@@ -68,7 +88,7 @@ export default {
         },
       });
   
-      return res.status(200).json(cliente);
+      return res.status(200).json({ message: "Cliente atualizado com sucesso." });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error });
@@ -96,7 +116,12 @@ export default {
         })
       );
   
-      await prisma.cliente.delete({ where: { id: Number(id) } });
+      await prisma.cliente.delete({
+        where: { id: Number(id) },
+        include: {
+          vendas: true,
+        } 
+      });
   
       return res.status(200).json({ message: "Cliente deletado com sucesso!" });
     } catch (error) {

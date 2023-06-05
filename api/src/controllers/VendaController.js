@@ -51,6 +51,16 @@ export default {
         },
         include: { cliente: true, vendaItens: true },
       });
+
+      for (const item of vendaItens) {
+        const produto = await prisma.produto.findUnique({ where: { id: item.produtoId } });
+        const novaQuantidade = produto.qtdLoja - item.quantidade;
+      
+        await prisma.produto.update({
+          where: { id: item.produtoId },
+          data: { qtdLoja: novaQuantidade },
+        });
+      }
   
       return res.status(201).json(venda);
     } catch (error) {

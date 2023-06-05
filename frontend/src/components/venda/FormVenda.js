@@ -9,15 +9,14 @@ import axios from 'axios';
 const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditModal }) => {
   const [showModal, setShowModal] = useState(false);
   const [produtos, setProdutos] = useState([]);
-  const [clienteList, setClienteList] = useState([]);
-  const [quantidade, setQuantidade] = useState([]);
+  const [clienteList, setClienteList] = useState("");
+  const [quantidade, setQuantidade] = useState([""]);
   const [data, setData] = useState("");
-  const [produtoList, setProdutoList] = useState([""]);
+  const [produtoList, setProdutoList] = useState("");
   const [clientes, setClientes] = useState([]);
   const [produtoValues, setProdutoValues] = useState([]);
   const [vendedor, setVendedor] = useState("");
-
-  console.log("Lista de cliente: " + clienteList);
+  const [quantidadeDisponivel, setQuantidadeDisponivel] = useState([]);
 
   const getClientes = async () => {
     try {
@@ -36,6 +35,7 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
     try {
       const res = await axios.get("http://localhost:8080/produtos");
       setProdutoValues(res.data);
+      setQuantidadeDisponivel(res.data.map(produto => produto.quantidade));
     } catch (error) {
       console.error(error);
     }
@@ -45,8 +45,6 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
     getProdutoValues();
   }, []);
 
-  console.log(clienteList);
-
     useEffect(() => {
       if (onEdit) {
         setVendedor(onEdit.vendedor);
@@ -55,13 +53,13 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
         setQuantidade([]);
         setData("")
       }
-    }, [onEdit]);
-
-  const handleChange = (selectedProductId, i) => {
+    }, [onEdit]);   
+    
+  /*const handleChange = (selectedProductId, i) => {
     const updatedProdutoList = [...produtoList];
     updatedProdutoList[i] = selectedProductId;
     setProdutoList(updatedProdutoList);
-  };
+  }; */
 
   const handleAdd = () => {
     const newProdutos = [...produtos, ""];
@@ -86,16 +84,19 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
     } else {
       setShowModal(false);
       setProdutos([""]);
-      setProdutoList([]);
-      setClienteList([]);
+      setProdutoList("");
+      setClienteList("");
       setVendedor("");
       setData("");
+      setQuantidade("");
     }
   };
 
   const handleShowModal = () => {
     setOnEdit(null);
     setShowModal(true);
+    setProdutos([""]);
+    setProdutoList([]);
   };
 
   const handleSubmit = async (e) => {
@@ -109,6 +110,10 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
       !vendedor
     ) {
       return toast.warn("Preencha todos os campos!");
+    }
+
+    if (quantidade <= 0) {
+      return toast.error("Quantidade inválida!");
     }
 
     const valores = produtoValues.map((produto, i) => quantidade[i] * produto.precoVenda);
@@ -162,8 +167,8 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
         <Modal.Header closeButton>
           <Modal.Title>
             {onEdit && Object.keys(onEdit).length > 0 ? 
-            (<span>Editar Cliente</span>) : 
-            (<span>Cadastrar Cliente</span>)}
+            (<span>Editar Venda</span>) : 
+            (<span>Cadastrar venda</span>)}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -187,6 +192,7 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
               <input id="data" type="date" className="form-control" value={data} onChange={(e) => setData(e.target.value)}/>
             </div>
             {produtos.map((produto, i) => {
+              
   return (
     <div key={i} className="row mb-3">
       <label htmlFor="produto-list" className="form-label">Produto: </label>
@@ -211,28 +217,28 @@ const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditMod
           ))}
         </select>
         <span className="input-group-text text-muted" style={{width: "25%", fontSize: "15px"}}>Quantidade: </span>
-                <input
-                type="number"
-                id="quantidade"
-                className="form-control"
-                style={{ width: "15%" }}
-                value={quantidade[i] || ""}
-                onChange={(e) => {
-                  const selectedQuantidade = e.target.value;
-                  const newQuantidade = [...quantidade];
-                  newQuantidade[i] = selectedQuantidade;
-                  setQuantidade(newQuantidade);
-                }}
-              />
+        <input
+        type="number"
+        id="quantidade"
+        className="form-control"
+        style={{ width: "15%" }}
+        value={quantidade[i] || ""}
+        onChange={(e) => {
+        const selectedQuantidade = e.target.value;
+        const newQuantidade = [...quantidade];
+        newQuantidade[i] = selectedQuantidade;
+        setQuantidade(newQuantidade);
+        }}
+        />
         {i > 0 && (
           <button type="button" className="btn btn-outline-danger" onClick={(e) => handleDelete(i, e)}>
             <FaTrash />
           </button>
         )}
+        </div>
       </div>
-    </div>
-  );
-})}
+        );
+      })}
             <div className="mb-3">
               <button onClick={handleAdd} className="btn btn-outline-primary" type="button">Adicionar</button>
             </div>
