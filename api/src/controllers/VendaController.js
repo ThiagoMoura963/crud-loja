@@ -7,7 +7,7 @@ export default {
     try {
       const { clienteId, vendedor, data, vendaItens } = req.body;
   
-      const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });
+      const cliente = await prisma.cliente.findUnique({ where: { id: Number(clienteId) } });
   
       if (!cliente) {
         return res.status(404).json({ error: "Cliente não encontrado" });
@@ -40,7 +40,7 @@ export default {
   
       const venda = await prisma.venda.create({
         data: {
-          cliente: { connect: { id: clienteId } },
+          cliente: { connect: { id: Number(clienteId) } },
           data: new Date(data),
           vendaItens: {
             create: vendaItensData,
@@ -100,7 +100,7 @@ export default {
         return res.status(404).json({ message: "Venda não encontrada" });
       }
   
-      const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });
+      const cliente = await prisma.cliente.findUnique({ where: { id: Number(clienteId) } });
   
       if (!cliente) {
         return res.status(404).json({ message: "Cliente não encontrado" });
@@ -116,7 +116,7 @@ export default {
       await prisma.venda.update({
         where: { nroVenda: Number(nroVenda) },
         data: {
-          cliente: { connect: { id: clienteId } },
+          cliente: { connect: { id: Number(clienteId) } },
           vendedor,
           valor,
           data,

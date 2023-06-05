@@ -2,6 +2,7 @@ import { Router } from 'express';
 import ClienteController from './controllers/ClienteController';
 import ProdutoController from './controllers/ProdutoController';
 import VendaController from './controllers/VendaController';
+import CalcularVendaController from './controllers/CalcularVendaController';
 
 const router = Router();
 
@@ -21,6 +22,8 @@ router.post("/venda", VendaController.createVenda);
 router.get("/vendas", VendaController.finAllVendas);
 router.put("/venda/:nroVenda", VendaController.updateVenda);
 router.delete("/venda/:nroVenda", VendaController.deleteVenda);
+
+router.post("/venda/calcular", CalcularVendaController.calcularVenda);
 
 
 router.get("/", (_, res) => {

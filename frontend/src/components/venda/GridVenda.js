@@ -2,13 +2,51 @@ import React, { useState } from 'react';
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import DeleteAlert from '../DeletAlert';
 import axios from 'axios';
 
-const GridVenda = ({ vendas, setVendas }) => {
+const GridVenda = ({ vendas, setVendas, setOnEdit, setShowEditModal, setShowModal }) => {
   const [showModalItens, setShowModalItens] = useState(false);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
+  const handleEdit = (item) => {
+    setOnEdit(item);
+	setShowEditModal(true);
+	setShowModal(false);	
+  };
+
+  const handleDelete = async (nroVenda) => {
+    await axios
+	.delete("http://localhost:8080/venda/" + nroVenda)
+	.then(({ data }) => {
+	  const newArray = vendas.filter((venda) => venda.nroVenda !== nroVenda);
+	  
+	  setVendas(newArray);
+	  toast.success(data.message);
+	})	
+	.catch((error) => console.error(error));
+
+	setOnEdit(null);
+  };
+
+  const openDeleteAlert = (nroVenda) => {
+    setSelectedUserId(nroVenda);
+	setShowDeleteAlert(true);
+  };
+
+  const closeDeleteAlert = () => {
+	setShowDeleteAlert(false);
+  };
+
+  const confirmDelete = () => {
+	if (selectedUserId) {
+	  handleDelete(selectedUserId);
+	  closeDeleteAlert();
+	}
+  };
+ 
   const openModalItens = () => {
     setShowModalItens(true);
   };
@@ -19,7 +57,11 @@ const GridVenda = ({ vendas, setVendas }) => {
 
   return (
     <div className="d-flex justify-content-center">
-	  <DeleteAlert />   	
+	  <DeleteAlert 
+	  show={showDeleteAlert}
+	  onCancel={closeDeleteAlert}
+	  onConfirm={confirmDelete} 
+	  />   	
 	  <Modal 
 	  show={showModalItens}
       onHide={closeModalItens}
@@ -80,12 +122,14 @@ const GridVenda = ({ vendas, setVendas }) => {
 			<td>
 			  <FaEdit 
 			  title="Editar"
+			  onClick={() => handleEdit(i)}
 			  style={{cursor: "pointer"}}
 			  />	
 			</td>
 			<td>
 			  <FaTrash 
 			  title="Deletar"
+			  onClick={() => openDeleteAlert(item.nroVenda)}
 			  style={{cursor: "pointer"}}
 			  />	
 			</td>

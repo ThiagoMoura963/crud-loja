@@ -10,7 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Definição do modelo Cliente
 model Cliente {
   id        Int      @id @default(autoincrement())
   nome      String  
@@ -20,7 +19,6 @@ model Cliente {
   vendas    Venda[] 
 }
 
-// Definição do modelo Produto
 model Produto {
   id              Int       @id @default(autoincrement())
   nome            String
@@ -36,7 +34,6 @@ model Produto {
   vendasItem      VendaItem[]
 }
 
-// Definição do modelo Venda
 model Venda {
   nroVenda     Int          @id @default(autoincrement())
   cliente      Cliente?      @relation(fields: [clienteId], references: [id])

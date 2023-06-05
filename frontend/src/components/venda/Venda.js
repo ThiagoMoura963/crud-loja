@@ -6,11 +6,15 @@ import axios from 'axios'
 
 const Venda = () => {
   const [vendas, setVendas] = useState([]);
+  const [onEdit, setOnEdit] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const getVendas = async () => {
     try {
 	  const res = await axios.get("http://localhost:8080/vendas"); 
 	  setVendas(res.data.sort((a, b) => (a.valor < b.valor ? 1 : -1)));	
+	  console.log(res.data);
 	} catch (error) {
 	  console.error(error);	
 	}
@@ -28,10 +32,12 @@ const Venda = () => {
 	  <hr className="custom-hr"/>
 
 	  <div className="mt-4 d-flex">
-		<FormVenda />
+		<FormVenda getVendas={getVendas} onEdit={onEdit} setOnEdit={setOnEdit} showEditModal={showEditModal} setShowEditModal={setShowEditModal}
+		setShowModal={setShowModal} showModal={showModal}/>
 	  </div>
 	  <div className="mt-4">
-		<GridVenda vendas={vendas} setVendas={setVendas} />
+		<GridVenda vendas={vendas} setVendas={setVendas} onEdit={onEdit} setOnEdit={setOnEdit} showEditModal={showEditModal}
+		setShowEditModal={setShowEditModal} setShowModal={setShowModal} showModal={showModal} />
 	  </div>
 	</div>
 

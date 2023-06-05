@@ -5,19 +5,76 @@ import { Modal, Button } from 'react-bootstrap';
 import { FaTrash } from "react-icons/fa";
 import axios from 'axios';
 
-const FormVenda = () => {
+const FormVenda = ({ getVendas, setOnEdit, onEdit, showEditModal, setShowEditModal }) => {
   const [showModal, setShowModal] = useState(false);
   const [produtos, setProdutos] = useState([""]);
+  const [clienteList, setClienteList] = useState([""]);
+  const [quantidade, setQuantidade] = useState([0]);
+  const [valorVenda, setValorVenda] = useState([]);
+  const [data, setData] = useState("");
+  const [produtoList, setProdutoList] = useState([]);
+  const [clientes, setClientes] = useState([]);
+  const [produtoValues, setProdutoValues] = useState([]);
+  const [vendedor, setVendedor] = useState("");
 
-  const handleChange = (onChangeValue, i) => {
-    const inputData=[...produtos];
-    inputData[i] = onChangeValue.target.value;  
-    setProdutos(inputData);
+
+  console.log("ID do Cliente: " + typeof clienteList);
+  console.log("ID do Produto: " + produtoList);
+  
+
+
+  const getClientes = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/clientes");
+      setClientes(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getClientes();
+  }, []);
+
+  const getProdutoValues = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/produtos");
+      setProdutoValues(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getProdutoValues();
+  }, []);
+
+
+  useEffect(() => {
+    if (onEdit) {
+      setClienteList(onEdit.clienteList);
+      setData(onEdit.data);
+      setProdutoList(onEdit.produtoList);
+      setQuantidade(onEdit.quantidade);
+      setVendedor(onEdit.vendedor);
+    } else {
+      setClienteList('');
+      setData('');
+      setProdutoList('');
+    }
+  }, [onEdit]);
+
+  const handleChange = (selectedProductId, i) => {
+    const updatedProdutoList = [...produtoList];
+    updatedProdutoList[i] = selectedProductId;
+    setProdutoList(updatedProdutoList);
   };
 
   const handleAdd = () => {
-    const values = [...produtos, []];
-    setProdutos(values);
+    const newProdutos = [...produtos, ""];
+    const newQuantidade = [...quantidade, 0];
+    setProdutos(newProdutos);
+    setQuantidade(newQuantidade);
   };
 
   const handleDelete = (i, e) => {
@@ -27,13 +84,50 @@ const FormVenda = () => {
     setProdutos(values);
   };
 
-  const handleShowModal = () => {
-    setShowModal(true); 
-  };
-
   const handleCloseModal = () => {
+    if(onEdit) {
+      setShowEditModal(false);
+    } else {
       setShowModal(false);
       setProdutos([""]);
+      setProdutoList([]);
+      setClienteList([]);
+      setVendedor("");
+      setData("");
+    }
+  };
+
+  const handleShowModal = () => {
+    setOnEdit(null);
+    setShowModal(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const valores = produtoValues.map((produto, i) => quantidade[i] * produto.precoVenda);
+    const valorTotal = valores.reduce((total, valor) => total + valor, 0);
+  
+    const vendaItensData = produtoList.map((produtoId, i) => {
+      return {
+        produtoId: parseInt(produtoId),
+        quantidade: parseInt(quantidade[i]),
+      };
+    });
+  
+    await axios
+      .post("http://localhost:8080/venda", {
+        clienteId: parseInt(clienteList),
+        vendedor,
+        data,
+        vendaItens: vendaItensData,
+        valor: parseFloat(valorTotal),
+      })
+      .then(() => toast.success("Venda cadastrada com sucesso"))
+      .catch((error) => console.error(error));
+  
+    handleCloseModal();
+    getVendas();
   };
 
   return (
@@ -50,44 +144,78 @@ const FormVenda = () => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <form>
-          <div className="mb-3">
+          <form onSubmit={handleSubmit}>
+          <div className="mb-3"> 
               <label className="form-label">Cliente:</label>
-              <select name="cliente" className="custom-select form-select mb-3">
-                <option value="" disabled selected hidden>Selecione um cliente</option>
-                <option value="opcao1">Opção 1</option>
-                <option value="opcao2">Opção 2</option>
-                <option value="opcao3">Opção 3</option>
+              <select name="cliente" className="custom-select form-select mb-3" 
+                value={clienteList}
+                onChange={(e) => { const selectedClientId = e.target.value;
+                setClienteList(selectedClientId);}}>
+                <option value="" disabled hidden>Selecione um cliente</option>
+                {clientes.map((cliente) => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.nome}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="mb-3">
               <label htmlFor="data" className="form-label">Data: </label>
-              <input id="data" type="date" className="form-control" />
+              <input id="data" type="date" className="form-control" value={data} onChange={(e) => setData(e.target.value)}/>
             </div>
-            {produtos.map((produto, i) => { 
-              return (
-            <div key={i} className="row mb-3" onChange={(e) => handleChange(e, i)}>
-              <label htmlFor="produto" className="form-label">Produto: </label>
-              <div className="input-group">
-                <select id="produto" class="form-select" style={{width: "50%"}}>
-                  <option value="" disabled selected hidden>Selecione um produto</option>
-                  <option value="produto1">Produto 1</option>
-                  <option value="produto2">Produto 2</option>
-                  <option value="produto3">Produto 3</option>
-                </select>
-                <span className="input-group-text text-muted" style={{width: "25%", fontSize: "15px"}}>Quantidade: </span>
-                <input type="number" className="form-control" style={{width: "15%"}} />
-                {i > 0 && (
-                  <button type="button" className="btn btn-outline-danger" onClick={(e) => handleDelete(i, e)}><FaTrash /></button> 
-                )}
-              </div>
-              <div className="mt-2">
-              </div>
-            </div> 
-              )
-            })}
+            {produtos.map((produto, i) => {
+  return (
+    <div key={i} className="row mb-3">
+      <label htmlFor="produto-list" className="form-label">Produto: </label>
+      <div className="input-group">
+        <select
+          id="produtoList"
+          className="form-select"
+          style={{ width: "50%" }}
+          value={produtoList[i] || ""}
+          onChange={(e) => {
+            const selectedProductId = e.target.value;
+            const updatedProdutoList = [...produtoList];
+            updatedProdutoList[i] = selectedProductId;
+            setProdutoList(updatedProdutoList);
+          }}
+        >
+          <option value="" disabled hidden>Selecione um produto</option>
+          {produtoValues.map((prod) => (
+            <option key={prod.id} value={prod.id}>
+              {prod.nome}
+            </option>
+          ))}
+        </select>
+        <span className="input-group-text text-muted" style={{width: "25%", fontSize: "15px"}}>Quantidade: </span>
+                <input
+                type="number"
+                id="quantidade"
+                className="form-control"
+                style={{ width: "15%" }}
+                value={quantidade[i] || ""}
+                onChange={(e) => {
+                  const selectedQuantidade = e.target.value;
+                  const inputQuantidade = [...quantidade];
+                  inputQuantidade[i] = selectedQuantidade;
+                  setQuantidade(inputQuantidade);
+                }}
+              />
+        {i > 0 && (
+          <button type="button" className="btn btn-outline-danger" onClick={(e) => handleDelete(i, e)}>
+            <FaTrash />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+})}
             <div className="mb-3">
               <button onClick={handleAdd} className="btn btn-outline-primary" type="button">Adicionar</button>
+            </div>
+            <div className="mb-3">  
+              <label className="form-label">Vendedor:</label>
+              <input value={vendedor} onChange={(e) => setVendedor(e.target.value)} className="form-control" />
             </div>
             <Button variant="success" type="submit">
               SALVAR

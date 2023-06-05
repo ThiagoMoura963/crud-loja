@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import DeleteAlert from "../DeletAlert";
 import axios from 'axios';
 
-const Grid = ({ users, setUsers, setOnEdit, setShowEditModal, setShowModal, onEdit }) => {
+const Grid = ({ users, setUsers, setOnEdit, setShowEditModal, setShowModal }) => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
